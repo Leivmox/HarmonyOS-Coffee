@@ -1,0 +1,50 @@
+# ======================================
+# Node / JS / TS 依赖
+# ======================================
+/node_modules
+/.npm
+/.yarn
+/.pnp.*
+/package-lock.json
+/yarn.lock
+
+# ======================================
+# DevEco/HarmonyOS 依赖 & 构建
+# ======================================
+/oh_modules
+/.ohpm                # DevEco ohpm 缓存目录
+**/build               # 编译生成的 build 文件夹
+/.hvigor               # hvigor 构建缓存
+/entry/obfuscation-rules.txt
+/entry/hvigorfile.ts
+/hvigor/
+*.o
+*.so
+
+# ======================================
+# 本地配置 & IDE 文件
+# ======================================
+/.local.properties
+/.idea
+/.vscode
+/.DS_Store
+/.clangd
+/.clang-format
+/.clang-tidy
+
+# ======================================
+# 测试文件 & 临时文件
+# ======================================
+**/.test
+**/*.test.ets
+/entry/mock/
+*.log
+*.tmp
+*.bak
+
+# ======================================
+# HarmonyOS 临时或自动生成资源
+# ======================================
+**/dist/
+**/temp/
+**/__pycache__/
