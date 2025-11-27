@@ -1,3 +1,9 @@
+import { userMsg } from '../model/model';
+import { vaildForm } from '../utils/validform';
+//导入及时反馈模块
+import { PromptAction } from '@kit.ArkUI';
+// import { PromptAction } from '@ohos.arkui.UIContext';
+
 @Entry
 @Component
 struct LoginPage {
@@ -11,6 +17,12 @@ struct LoginPage {
   @State regNickName: string = "";
   // 1. 定义一个是否显示注册模态转场: @State 状态变量，初始为 false (隐藏)
   @State showSheet: boolean = false;
+
+
+  // let promptAction:PromptAction = this.getUIContest();
+
+  //创建及时反馈
+  private promptAction:PromptAction = this.getUIContext().getPromptAction();
 
   // //自定义构建函数
   // @Builder
@@ -75,19 +87,20 @@ struct LoginPage {
           console.log("手机号.密码,昵称=>", this.regPhone, this.regPassword, this.regNickName)
 
 
-          interface userMsg {
-            phone: rule,
-            password: rule,
-            nickname: rule
-
-          }
-
-          //定义一个接口,
-          interface rule {
-            val: string, //当前属性原本的值
-            regexpRule: RegExp, //当前属性的匹配规则
-            errMsg: string //当前属性的错误信息(验证不通过的提示)
-          }
+          // //接口:约束对象格式
+          // interface userMsg {
+          //   phone: rule,
+          //   password: rule,
+          //   nickname: rule
+          //
+          // }
+          //
+          // //定义一个接口,
+          // interface rule {
+          //   val: string, //当前属性原本的值
+          //   regexpRule: RegExp, //当前属性的匹配规则
+          //   errMsg: string //当前属性的错误信息(验证不通过的提示)
+          // }
 
           //构建一个 用户注册信息的对象 用于表单验证
           let reg_user_msg: userMsg = {
@@ -108,33 +121,41 @@ struct LoginPage {
             }
           }
 
-          //开始验证
-          //获取对象的 key,确定要验证的输入框
-          let keys: string[] = Object.keys(reg_user_msg); //拿到了对象键名的字符串数组
+          // //开始验证
+          // //获取对象的 key,确定要验证的输入框
+          // let keys: string[] = Object.keys(reg_user_msg); //拿到了对象键名的字符串数组
+          //
+          // //假设所有表单都验证通过
+          // let flag: boolean = true;
+          //
+          // for (const item of keys) {
+          //   // console.log("对象的键名=> ", item);
+          //
+          //   // console.log("当前属性的值", JSON.stringify(Object(reg_user_msg)[item]));
+          //
+          //   //拿到当前属性的值(子对象)
+          //   let obj: rule = Object(reg_user_msg)[item];
+          //
+          //   //验证值是否符合规则  => 语法:正则.test("要验证的值")
+          //   if (!obj.regexpRule.test(obj.val)) {
+          //     //某个输入框不通过,输出当前错误信息,flag假设不成立,跳出循环
+          //     console.log(obj.errMsg);
+          //     flag = false;
+          //     break;
+          //   }
+          // }
+          // if(flag){
+          //   console.log("表单验证通过")
+          //   //真正的注册逻辑
+          // }
 
-          //假设所有表单都验证通过
-          let flag: boolean = true;
 
-          for (const item of keys) {
-            // console.log("对象的键名=> ", item);
-
-            // console.log("当前属性的值", JSON.stringify(Object(reg_user_msg)[item]));
-
-            //拿到当前属性的值(子对象)
-            let obj: rule = Object(reg_user_msg)[item];
-
-            //验证值是否符合规则  => 语法:正则.test("要验证的值")
-            if (!obj.regexpRule.test(obj.val)) {
-              //某个输入框不通过,输出当前错误信息,flag假设不成立,跳出循环
-              console.log(obj.errMsg);
-              flag = false;
-              break;
-            }
-          }
-
-          if(flag){
-            console.log("表单验证通过")
-            //真正的注册逻辑
+          this.promptAction.showToast({
+            message:"测试吐司"
+          })
+          let vaild_result: boolean = vaildForm(reg_user_msg)
+          if (vaild_result) {
+            //真正的注册功能
           }
 
         })
