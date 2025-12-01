@@ -309,6 +309,7 @@ struct LoginPage {
                     router.pushUrl({
                       url: "pages/Index"
                     })
+                    //TODO.. 储存用户token
                   }
                 })
 
