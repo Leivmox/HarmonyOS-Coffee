@@ -28,6 +28,8 @@ export default struct My {
         router.pushUrl({ url: "pages/MyCollect" })
       } else if (title === "个人资料") {
         router.pushUrl({ url: "pages/PersonalInfo" })
+      } else if (title === "安全中心") {
+        router.pushUrl({ url: "pages/SafetyCenter" }) // 确保文件名一致
       }
       // 可以在这里加其他的跳转，比如 "地址管理" 等
     })

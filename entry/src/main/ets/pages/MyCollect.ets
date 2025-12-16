@@ -122,7 +122,7 @@ struct MyCollect {
         // (A) 蓝色背景填充
         Column()
           .width('100%')
-          .height(180)
+          .height(130)
           .backgroundColor('#0C34BA')
 
         // (B) 核心内容大框

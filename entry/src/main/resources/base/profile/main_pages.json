@@ -5,6 +5,7 @@
     "pages/SearchPage",
     "pages/DetailPage",
     "pages/MyCollect",
-    "pages/PersonalInfo"
+    "pages/PersonalInfo",
+    "pages/SafetyCenter"
   ]
 }

@@ -240,3 +240,19 @@ export function removeShopcart(token:string, sids:string ):Promise<http.HttpResp
     sids
   }))
 }
+
+/**
+ * @description 修改密码接口
+ * 请求地址：http://apis.netstart.cn/coffee/updatePassword
+ * 请求类型： POST
+ * @param token: 用户token
+ * @param newPassword: 新密码
+ * @param oldPassword: 旧密码
+ */
+export function updatePassword(token: string, newPassword: string, oldPassword: string): Promise<http.HttpResponse> {
+  return request("/updatePassword", "post", Object({
+    tokenString: token,
+    password: newPassword,
+    oldPassword: oldPassword
+  }))
+}
