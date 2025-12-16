@@ -255,9 +255,16 @@ export default struct ShopBag {
             }
           }
         }
+        .justifyContent(FlexAlign.Start)
+        .width("100%")
       }
       .width("100%")
-      .height("calc(100% - 160.8vp)")
+      // 【关键修改 1】: 占据剩余所有高度，不再使用 calc
+      .layoutWeight(1)
+      // 【关键修改 2】: 强制内容顶端对齐
+      .align(Alignment.Top)
+      // .width("100%")
+      // .height("calc(100% - 160.8vp)")
 
       // 4. 底部结算栏
       Row({ space: 10 }) {
