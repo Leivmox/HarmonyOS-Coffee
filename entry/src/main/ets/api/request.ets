@@ -51,7 +51,7 @@ export function request(url: string, method: string, params: object) {
     //请求头
     header: {
       //在本项目，post请求的参数，以表单结构传递参数:参数1=值& 参数2=值& 参数3=值....
-      "Content-Type": "application/x-www-form-urlencoded;"
+      "Content-Type": "application/x-www-form-urlencoded"
     },
     //请求参数
     extraData: param,

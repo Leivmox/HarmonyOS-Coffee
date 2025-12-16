@@ -1,49 +1,49 @@
 {
   "ohos-module-entry": {
     "SELECT_TARGET": "default",
-    "MODULE_BUILD_DIR": "C:\\Users\\wu\\Desktop\\luckin_coffee\\entry\\build",
+    "MODULE_BUILD_DIR": "D:\\Lambda\\git_repo\\HarmonyOS-Coffee\\entry\\build",
     "TARGETS": {
       "default": {
-        "SOURCE_ROOT": "C:\\Users\\wu\\Desktop\\luckin_coffee\\entry\\src\\main",
+        "SOURCE_ROOT": "D:\\Lambda\\git_repo\\HarmonyOS-Coffee\\entry\\src\\main",
         "RESOURCES_PATH": [
-          "C:\\Users\\wu\\Desktop\\luckin_coffee\\entry\\src\\main\\resources"
+          "D:\\Lambda\\git_repo\\HarmonyOS-Coffee\\entry\\src\\main\\resources"
         ],
         "BUILD_PATH": {
-          "OUTPUT_PATH": "C:\\Users\\wu\\Desktop\\luckin_coffee\\entry\\build\\default\\outputs\\default",
-          "INTERMEDIA_PATH": "C:\\Users\\wu\\Desktop\\luckin_coffee\\entry\\build\\default\\intermediates",
-          "JS_ASSETS_PATH": "C:\\Users\\wu\\Desktop\\luckin_coffee\\entry\\build\\default\\intermediates\\loader_out\\default",
-          "JS_LITE_ASSETS_PATH": "C:\\Users\\wu\\Desktop\\luckin_coffee\\entry\\build\\default\\intermediates\\loader_out_lite\\default",
-          "RES_PATH": "C:\\Users\\wu\\Desktop\\luckin_coffee\\entry\\build\\default\\intermediates\\res\\default",
-          "RES_PROFILE_PATH": "C:\\Users\\wu\\Desktop\\luckin_coffee\\entry\\build\\default\\intermediates\\res\\default\\resources\\base\\profile",
-          "ETS_SUPER_VISUAL_PATH": "C:\\Users\\wu\\Desktop\\luckin_coffee\\entry\\build\\default\\cache\\default\\default@CompileArkTS\\esmodule",
-          "JS_SUPER_VISUAL_PATH": "C:\\Users\\wu\\Desktop\\luckin_coffee\\entry\\build\\default\\cache\\default\\default@CompileJS\\jsbundle",
-          "WORKER_LOADER": "C:\\Users\\wu\\Desktop\\luckin_coffee\\entry\\build\\default\\intermediates\\loader\\default\\loader.json",
-          "MANIFEST_JSON": "C:\\Users\\wu\\Desktop\\luckin_coffee\\entry\\build\\default\\intermediates\\manifest\\default",
-          "OUTPUT_METADATA_JSON": "C:\\Users\\wu\\Desktop\\luckin_coffee\\entry\\build\\default\\intermediates\\hap_metadata\\default\\output_metadata.json",
-          "SOURCE_MAP_DIR": "C:\\Users\\wu\\Desktop\\luckin_coffee\\entry\\build\\default\\intermediates\\source_map\\default"
+          "OUTPUT_PATH": "D:\\Lambda\\git_repo\\HarmonyOS-Coffee\\entry\\build\\default\\outputs\\default",
+          "INTERMEDIA_PATH": "D:\\Lambda\\git_repo\\HarmonyOS-Coffee\\entry\\build\\default\\intermediates",
+          "JS_ASSETS_PATH": "D:\\Lambda\\git_repo\\HarmonyOS-Coffee\\entry\\build\\default\\intermediates\\loader_out\\default",
+          "JS_LITE_ASSETS_PATH": "D:\\Lambda\\git_repo\\HarmonyOS-Coffee\\entry\\build\\default\\intermediates\\loader_out_lite\\default",
+          "RES_PATH": "D:\\Lambda\\git_repo\\HarmonyOS-Coffee\\entry\\build\\default\\intermediates\\res\\default",
+          "RES_PROFILE_PATH": "D:\\Lambda\\git_repo\\HarmonyOS-Coffee\\entry\\build\\default\\intermediates\\res\\default\\resources\\base\\profile",
+          "ETS_SUPER_VISUAL_PATH": "D:\\Lambda\\git_repo\\HarmonyOS-Coffee\\entry\\build\\default\\cache\\default\\default@CompileArkTS\\esmodule",
+          "JS_SUPER_VISUAL_PATH": "D:\\Lambda\\git_repo\\HarmonyOS-Coffee\\entry\\build\\default\\cache\\default\\default@CompileJS\\jsbundle",
+          "WORKER_LOADER": "D:\\Lambda\\git_repo\\HarmonyOS-Coffee\\entry\\build\\default\\intermediates\\loader\\default\\loader.json",
+          "MANIFEST_JSON": "D:\\Lambda\\git_repo\\HarmonyOS-Coffee\\entry\\build\\default\\intermediates\\manifest\\default",
+          "OUTPUT_METADATA_JSON": "D:\\Lambda\\git_repo\\HarmonyOS-Coffee\\entry\\build\\default\\intermediates\\hap_metadata\\default\\output_metadata.json",
+          "SOURCE_MAP_DIR": "D:\\Lambda\\git_repo\\HarmonyOS-Coffee\\entry\\build\\default\\intermediates\\source_map\\default"
         },
         "BUILD_OPTION": {
           "debuggable": true
         }
       },
       "ohosTest": {
-        "SOURCE_ROOT": "C:\\Users\\wu\\Desktop\\luckin_coffee\\entry\\src\\ohosTest",
+        "SOURCE_ROOT": "D:\\Lambda\\git_repo\\HarmonyOS-Coffee\\entry\\src\\ohosTest",
         "RESOURCES_PATH": [
-          "C:\\Users\\wu\\Desktop\\luckin_coffee\\entry\\src\\ohosTest\\resources"
+          "D:\\Lambda\\git_repo\\HarmonyOS-Coffee\\entry\\src\\ohosTest\\resources"
         ],
         "BUILD_PATH": {
-          "OUTPUT_PATH": "C:\\Users\\wu\\Desktop\\luckin_coffee\\entry\\build\\default\\outputs\\ohosTest",
-          "INTERMEDIA_PATH": "C:\\Users\\wu\\Desktop\\luckin_coffee\\entry\\build\\default\\intermediates",
-          "JS_ASSETS_PATH": "C:\\Users\\wu\\Desktop\\luckin_coffee\\entry\\build\\default\\intermediates\\loader_out\\ohosTest",
-          "JS_LITE_ASSETS_PATH": "C:\\Users\\wu\\Desktop\\luckin_coffee\\entry\\build\\default\\intermediates\\loader_out_lite\\ohosTest",
-          "RES_PATH": "C:\\Users\\wu\\Desktop\\luckin_coffee\\entry\\build\\default\\intermediates\\res\\ohosTest",
-          "RES_PROFILE_PATH": "C:\\Users\\wu\\Desktop\\luckin_coffee\\entry\\build\\default\\intermediates\\res\\ohosTest\\resources\\base\\profile",
-          "ETS_SUPER_VISUAL_PATH": "C:\\Users\\wu\\Desktop\\luckin_coffee\\entry\\build\\default\\cache\\ohosTest\\ohosTest@OhosTestCompileArkTS\\esmodule",
-          "JS_SUPER_VISUAL_PATH": "C:\\Users\\wu\\Desktop\\luckin_coffee\\entry\\build\\default\\cache\\ohosTest\\ohosTest@OhosTestCompileJS\\jsbundle",
-          "WORKER_LOADER": "C:\\Users\\wu\\Desktop\\luckin_coffee\\entry\\build\\default\\intermediates\\loader\\ohosTest\\loader.json",
-          "MANIFEST_JSON": "C:\\Users\\wu\\Desktop\\luckin_coffee\\entry\\build\\default\\intermediates\\manifest\\ohosTest",
-          "OUTPUT_METADATA_JSON": "C:\\Users\\wu\\Desktop\\luckin_coffee\\entry\\build\\default\\intermediates\\hap_metadata\\ohosTest\\output_metadata.json",
-          "SOURCE_MAP_DIR": "C:\\Users\\wu\\Desktop\\luckin_coffee\\entry\\build\\default\\intermediates\\source_map\\ohosTest"
+          "OUTPUT_PATH": "D:\\Lambda\\git_repo\\HarmonyOS-Coffee\\entry\\build\\default\\outputs\\ohosTest",
+          "INTERMEDIA_PATH": "D:\\Lambda\\git_repo\\HarmonyOS-Coffee\\entry\\build\\default\\intermediates",
+          "JS_ASSETS_PATH": "D:\\Lambda\\git_repo\\HarmonyOS-Coffee\\entry\\build\\default\\intermediates\\loader_out\\ohosTest",
+          "JS_LITE_ASSETS_PATH": "D:\\Lambda\\git_repo\\HarmonyOS-Coffee\\entry\\build\\default\\intermediates\\loader_out_lite\\ohosTest",
+          "RES_PATH": "D:\\Lambda\\git_repo\\HarmonyOS-Coffee\\entry\\build\\default\\intermediates\\res\\ohosTest",
+          "RES_PROFILE_PATH": "D:\\Lambda\\git_repo\\HarmonyOS-Coffee\\entry\\build\\default\\intermediates\\res\\ohosTest\\resources\\base\\profile",
+          "ETS_SUPER_VISUAL_PATH": "D:\\Lambda\\git_repo\\HarmonyOS-Coffee\\entry\\build\\default\\cache\\ohosTest\\ohosTest@OhosTestCompileArkTS\\esmodule",
+          "JS_SUPER_VISUAL_PATH": "D:\\Lambda\\git_repo\\HarmonyOS-Coffee\\entry\\build\\default\\cache\\ohosTest\\ohosTest@OhosTestCompileJS\\jsbundle",
+          "WORKER_LOADER": "D:\\Lambda\\git_repo\\HarmonyOS-Coffee\\entry\\build\\default\\intermediates\\loader\\ohosTest\\loader.json",
+          "MANIFEST_JSON": "D:\\Lambda\\git_repo\\HarmonyOS-Coffee\\entry\\build\\default\\intermediates\\manifest\\ohosTest",
+          "OUTPUT_METADATA_JSON": "D:\\Lambda\\git_repo\\HarmonyOS-Coffee\\entry\\build\\default\\intermediates\\hap_metadata\\ohosTest\\output_metadata.json",
+          "SOURCE_MAP_DIR": "D:\\Lambda\\git_repo\\HarmonyOS-Coffee\\entry\\build\\default\\intermediates\\source_map\\ohosTest"
         },
         "BUILD_OPTION": {
           "debuggable": true
@@ -109,15 +109,15 @@
   },
   "ohos-project": {
     "SELECT_PRODUCT_NAME": "default",
-    "MODULE_BUILD_DIR": "C:\\Users\\wu\\Desktop\\luckin_coffee\\build",
+    "MODULE_BUILD_DIR": "D:\\Lambda\\git_repo\\HarmonyOS-Coffee\\build",
     "BUNDLE_NAME": "com.example.luckin_coffee",
     "BUILD_PATH": {
-      "OUTPUT_PATH": "C:\\Users\\wu\\Desktop\\luckin_coffee\\build\\outputs\\default"
+      "OUTPUT_PATH": "D:\\Lambda\\git_repo\\HarmonyOS-Coffee\\build\\outputs\\default"
     },
     "MODULES": [
       {
         "name": "entry",
-        "srcPath": "C:\\Users\\wu\\Desktop\\luckin_coffee\\entry",
+        "srcPath": "D:\\Lambda\\git_repo\\HarmonyOS-Coffee\\entry",
         "targets": [
           {
             "name": "default",
@@ -126,7 +126,7 @@
             ]
           }
         ],
-        "belongProjectPath": "C:\\Users\\wu\\Desktop\\luckin_coffee"
+        "belongProjectPath": "D:\\Lambda\\git_repo\\HarmonyOS-Coffee"
       }
     ],
     "PROFILE_OPT": {
@@ -177,7 +177,7 @@
       "hvigor.keepDependency": true
     },
     "OVERALL_PROJECT_PATHS": [
-      "C:\\Users\\wu\\Desktop\\luckin_coffee"
+      "D:\\Lambda\\git_repo\\HarmonyOS-Coffee"
     ],
     "BUILD_CACHE_DIR": ""
   },

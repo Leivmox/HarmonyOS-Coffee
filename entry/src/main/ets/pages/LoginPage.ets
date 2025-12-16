@@ -1,12 +1,12 @@
 //导入数据格式
-import { userMsg } from "../model/model"
+import { userMsg } from '../model/model';
 //导入表单验证模块
-import { validForm } from "../utils/validForm"
+import { validForm } from '../utils/validForm';
 //导入及时反馈模块
-import { PromptAction, router } from "@kit.ArkUI";
+import { PromptAction, router } from '@kit.ArkUI';
 //导入注册,登录接口
-import { register,login } from "../api/api";
-import { saveStorage } from "../utils/storage";
+import { login, register } from '../api/api';
+import { saveStorage } from '../utils/storage';
 
 
 // //调用网络请求 测试一言
@@ -161,9 +161,9 @@ struct LoginPage {
         Text("先逛一逛")
           .fontColor($r("app.color.theme_color"))
           .fontWeight(FontWeight.Bold)
-          .onClick(()=>{
+          .onClick(() => {
             router.pushUrl({
-              url:"pages/Index"
+              url: "pages/Index"
             })
           })
       }
@@ -186,95 +186,105 @@ struct LoginPage {
       .alignItems(HorizontalAlign.Start)
 
       //登录表单
-      Column(){
-      //手机号码
-      this.myPhoneInput("手机号", this.userPhone, InputType.PhoneNumber, (val) => {
-        this.userPhone = val;
-      })
+      Column() {
+        //手机号码
+        this.myPhoneInput("手机号", this.userPhone, InputType.PhoneNumber, (val) => {
+          this.userPhone = val;
+        })
 
-      //密码
-      this.myPhoneInput("密码", this.userPassword, InputType.Password, (val) => {
-        this.userPassword = val;
-      })
+        //密码
+        this.myPhoneInput("密码", this.userPassword, InputType.Password, (val) => {
+          this.userPassword = val;
+        })
 
-      //忘记密码
-      Text("忘记密码？")
-        .width("100%")
-        .margin({ top: 20 })
-        .textAlign(TextAlign.End)
-        .fontColor(Color.Gray)
+        //忘记密码
+        Text("忘记密码？")
+          .width("100%")
+          .margin({ top: 20 })
+          .textAlign(TextAlign.End)
+          .fontColor(Color.Gray)
 
-      Button("登录")
+        Button("登录")
+          .width("100%")
+          .height(50)
+          .margin({ top: 50 })
+          .borderRadius(25)
+          .onClick((event: ClickEvent) => {
+            //表单验证
+            //构建一个 用户注册的信息对象  用于表单验证
+            let login_user_msg: userMsg = {
+              phone: {
+                val: this.userPhone,
+                regexpRule: new RegExp("^1[3-9]\\d{9}$"),
+                errMsg: "手机号码格式不正确"
+              },
+              password: {
+                val: this.userPassword,
+                regexpRule: new RegExp("^[A-Za-z]\\w{5,15}$"),
+                errMsg: "密码以字母开头，可以是字母数字下划线，6到16位"
+              },
+            }
+            //开始验证
+            let valid_result: boolean = validForm(login_user_msg, this.promptAction);
+            //验证通过,调用登录接口
+            if (valid_result) {
+              //真正的登录逻辑
+              login(this.userPhone, this.userPassword)
+                .then(res => {
+                  console.log("登录接口请求成功=>", JSON.stringify(Object(res).result))
+
+                  //Toast显示登录结果
+                  this.promptAction.showToast({
+                    message: Object(res).result.msg
+                  })
+                  //登陆成功
+                  if (Object(res).result.code == 200) {
+                    // 【关键修改 1】先保存 Token！
+                    let key: string = "user_token";
+                    let val: string = Object(res).result.token
+                    // 【关键修改】传入 getContext(this) 确保上下文正确
+                    saveStorage(key, val, getContext(this));
+                    // 确保数据写入 Storage
+                    // saveStorage(key, val)
+                    console.log("Token已保存，准备跳转");
+
+
+                    //跳转到首页router
+                    router.pushUrl({
+                      url: "pages/Index"
+                    })
+
+                    //持久化存储 登录状态token
+                    // let key: string = "user_token";
+                    // let val: string = Object(res).result.token
+                    // saveStorage(key, val)
+                  }
+                })
+            }
+          })
+      }
+
+      Button("注册")
         .width("100%")
         .height(50)
         .margin({ top: 50 })
         .borderRadius(25)
+        .fontColor("#888")
+        .backgroundColor(Color.White)
+        .border({
+          width: 1,
+          color: "#ddd"
+        })
         .onClick((event: ClickEvent) => {
-          //表单验证
-          //构建一个 用户注册的信息对象  用于表单验证
-          let login_user_msg: userMsg = {
-            phone: {
-              val: this.userPhone,
-              regexpRule: new RegExp("^1[3-9]\\d{9}$"),
-              errMsg: "手机号码格式不正确"
-            },
-            password: {
-              val: this.userPassword,
-              regexpRule: new RegExp("^[A-Za-z]\\w{5,15}$"),
-              errMsg: "密码以字母开头，可以是字母数字下划线，6到16位"
-            },
-          }
-          //开始验证
-          let valid_result: boolean = validForm(login_user_msg, this.promptAction);
-          //验证通过,调用登录接口
-          if (valid_result) {
-            //真正的登录逻辑
-            login(this.userPhone,this.userPassword)
-              .then(res=>{
-                console.log("登录接口请求成功=>",JSON.stringify(Object(res).result))
-
-                //Toast显示登录结果
-                this.promptAction.showToast({
-                  message:Object(res).result.msg
-                })
-                //登陆成功
-                if (Object(res).result.code == 200) {
-                  //跳转到首页router
-                  router.pushUrl({
-                    url: "pages/Index"
-                  })
-
-                  //持久化存储 登录状态token
-                  let key:string = "user_token";
-                  let val :string = Object(res).result.token
-                  saveStorage(key,val)
-                }
-              })
-          }
-          })
-        }
-
-          Button("注册")
-            .width("100%")
-            .height(50)
-            .margin({ top: 50 })
-            .borderRadius(25)
-            .fontColor("#888")
-            .backgroundColor(Color.White)
-            .border({
-              width: 1,
-              color: "#ddd"
-            })
-            .onClick((event: ClickEvent) => {
-              //显示注册页面
-              this.isShowSheet = true;
-            })
-            //半模态转场
-            .bindSheet($$this.isShowSheet, this.customSheet(), {
-              height: "50%",
-              showClose: false
-            })
-        }
-          .padding({ left: 10, right: 10 })
+          //显示注册页面
+          this.isShowSheet = true;
+        })
+        //半模态转场
+        .bindSheet($$this.isShowSheet, this.customSheet(), {
+          height: "50%",
+          showClose: false
+        })
     }
+    .padding({ left: 10, right: 10 })
   }
+}

@@ -72,6 +72,11 @@ export default struct Home {
           Text("登录")
             .fontSize(14)
             .fontWeight(FontWeight.Bold)
+            .onClick(() => {
+              router.pushUrl({
+                url: "pages/LoginPage"
+              })
+            })
         }
 
         //b.右边搜索框

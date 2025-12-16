@@ -1,43 +1,57 @@
 // 数据接口
-import { findAllShopcart, modifyShopcartCount, removeShopcart } from "../api/api"
+import { findAllShopcart, modifyShopcartCount, removeShopcart } from '../api/api';
 // 购物车数据类型约束
-import { shopBagItem } from "../model/model"
-
-import { delStorage, getStorage } from "../utils/storage";
-import { router } from "@kit.ArkUI";
-
-import {
-  debounce
-} from "../utils/debounce"
-
+import { shopBagItem } from '../model/model';
+import { getStorage } from '../utils/storage';
+import { router, promptAction } from '@kit.ArkUI';
+import { debounce } from '../utils/debounce';
 
 /**
- * @description 修改购物车商品数量(防抖)  f = (token:string, sid:string, count:string)=>{}
- * @param token 用户token,
- * @param sid 购物车商品id,
- * @param count 商品数量
- * @return
+ * @description 修改购物车商品数量(防抖)
  */
-let f = debounce( (token:string, sid:string, count:string)=>{
+let f = debounce((token: string, sid: string, count: string) => {
   modifyShopcartCount(token, sid, count)
-    .then( res=>{
-      console.log("修改购物车数量(接口版) =>", JSON.stringify(Object(res).result));
+    .then(res => {
+      let resData = Object(res).result as Record<string, Object>;
+      console.log("修改购物车数量(接口版) =>", JSON.stringify(resData));
     })
-},  500 );
+}, 500);
 
 
-// 自定义组件
 @Entry
-  // TODO:..
 @Component
 export default struct ShopBag {
-  // 购物袋商品列表
   @State shopbag_list: shopBagItem[] = [];
-  // 商品列表对应的商品数量
   @State count_arr: number[] = [];
+  @State user_token: string = "";
 
-  // 自定义构建函数 -- 列表的划出组件
-  @Builder itemEnd( idx:number, onClick:()=>void ){
+  // 添加一个标记，防止短时间内重复刷新
+  private isRefreshing: boolean = false;
+
+  /**
+   * 删除功能封装
+   */
+  deleteItem(index: number) {
+    if (!this.shopbag_list[index]) return;
+
+    let sids: string[] = [];
+    sids.push(this.shopbag_list[index].sid);
+
+    removeShopcart(this.user_token, JSON.stringify(sids))
+      .then(res => {
+        let resBody = res.result as Record<string, Object>;
+        console.log("删除结果 =>", JSON.stringify(resBody));
+
+        if ((resBody['code'] as number) == 7000) {
+          this.shopbag_list.splice(index, 1);
+          this.count_arr.splice(index, 1);
+          promptAction.showToast({ message: '删除成功' });
+        }
+      })
+  }
+
+  @Builder
+  itemEnd(idx: number, onClick: () => void) {
     Text("删除")
       .padding(5)
       .fontSize(16)
@@ -46,51 +60,86 @@ export default struct ShopBag {
       .width(60)
       .height("100%")
       .backgroundColor(Color.Red)
-      .borderRadius({topRight: 10, bottomRight: 10})
+      .borderRadius({ topRight: 10, bottomRight: 10 })
       .onClick(onClick)
   }
 
-  // 用户token
-  private user_token: string = "";
-
   // 获取购物车商品
   private findAllShopcart() {
-    // 已经登录，查购物车商品
     if (this.user_token.length) {
+      // 标记正在刷新
+      this.isRefreshing = true;
+
       findAllShopcart(this.user_token)
         .then(res => {
-          // 获取到商品数据， 赋值给购物车商品列表
-          this.shopbag_list = Object(res).result.result;
-          console.log("购物车商品数据 =>", JSON.stringify(this.shopbag_list))
+          let responseBody = res.result as Record<string, Object>;
+          let listData = responseBody['result'] as shopBagItem[];
 
-          // 局部变量（数量数组）， 这里是数组映射 map， 把原数组的某个值，经过处理，映射成一组新的数组
-          let count_arr:number[] = this.shopbag_list.map((v:shopBagItem)=>{
-            return v.count;
+          // 强制覆盖数据
+          this.shopbag_list = listData ? listData : [];
+          console.log("购物车数据成功加载 =>", JSON.stringify(this.shopbag_list))
+
+          // 初始化数量数组
+          let count_arr: number[] = this.shopbag_list.map((v: shopBagItem) => {
+            return Number(v.count);
           })
-          // 一次性赋值给状态遍历
           this.count_arr = count_arr;
-          console.log("每一件商品的数量 =>", JSON.stringify(count_arr))
+        })
+        .catch((err: Error) => {
+          console.error("获取购物车失败:", JSON.stringify(err));
+        })
+        .finally(() => {
+          this.isRefreshing = false;
         })
     }
   }
 
-  // 生命周期 页面即将显示
-  aboutToAppear() {
-    // 获取token
-    this.user_token = getStorage("user_token") as string;
-    // 获取购物车商品
-    this.findAllShopcart();
+  /**
+   * 统一的数据初始化方法
+   */
+  initData() {
+    // 1. 获取 Token
+    let token = getStorage("user_token", getContext(this));
+    this.user_token = token ? token.toString() : "";
+
+    console.log("ShopBag 尝试刷新数据, Token:", this.user_token);
+
+    // 2. 如果有 token，请求数据
+    if (this.user_token) {
+      this.findAllShopcart();
+    } else {
+      this.shopbag_list = [];
+      this.count_arr = [];
+    }
   }
 
-  // 页面结构
+  // 1. 保留 onPageShow，以防你是通过 router 跳转进来的
+  onPageShow() {
+    console.log("ShopBag onPageShow 触发");
+    this.initData();
+  }
+
+  // 2. 页面首次加载
+  aboutToAppear() {
+    console.log("ShopBag aboutToAppear 触发");
+    this.initData();
+  }
+
   build() {
     Column() {
-
       // 1. 顶部导航
       Row() {
         Text("< 返回").fontColor($r("app.color.theme_color"))
+          .onClick(() => { router.back() })
+
         Text("购物袋")
-        Text("编辑").fontColor($r("app.color.theme_color"))
+
+        // 【新增】手动刷新按钮，防止自动刷新失效时可以用
+        Text("刷新").fontColor($r("app.color.theme_color"))
+          .onClick(() => {
+            this.initData();
+            promptAction.showToast({ message: '已刷新' });
+          })
       }
       .width("100%")
       .height(56)
@@ -101,196 +150,148 @@ export default struct ShopBag {
       // 2. 背景
       Image($r("app.media.shopbag_bg")).width("100%")
 
-      // 3. 滚动视图(购物车商品列表 / 空状态)
+      // 3. 列表区域
       Scroll() {
         Column() {
-          // 没有登录
           if (!this.user_token.length) {
             Row() {
               Text("还未登录，先")
               Text("登录")
                 .fontColor($r("app.color.theme_color"))
                 .onClick(() => {
-                  router.pushUrl({
-                    url: "pages/LoginPage"
-                  })
+                  router.pushUrl({ url: "pages/LoginPage" })
                 })
             }
+            .margin({ top: 20 })
           }
-          // 没有商品
           else if (!this.shopbag_list.length) {
-            Text("目前还没有商品")
+            Text("目前还没有商品 (点击右上角刷新试试)")
+              .margin({ top: 20 })
+              .fontColor(Color.Gray)
           }
-          // 有商品
           else {
-
-            List(){
-              ForEach(this.shopbag_list, (item:shopBagItem, index:number)=>{
-                ListItem(){
-                  // 每一行商品 左(复选框) 中(图片) 右(描述)
-                  Row({space: 10}) {
-                    // 左(复选框)
+            List() {
+              ForEach(this.shopbag_list, (item: shopBagItem, index: number) => {
+                ListItem() {
+                  Row({ space: 10 }) {
                     Checkbox({ group: "shopbagCheckBox" })
-                    // 中(图片)
-                    Image(item.small_img)
-                      .width(90)
-                      .height(90)
-                    // 右(描述)
+                    Image(item.small_img).width(90).height(90)
+
                     Column() {
-                      // 上: 名称和规格
                       Row() {
-                        Text(item.name)
-                          .margin({ right: 20 })
-                          .fontSize(14)
+                        Text(item.name).margin({ right: 20 }).fontSize(14)
                         Text(item.rule).fontSize(14)
                       }
-                      // 中: 英文名字
                       Text(item.enname)
-                        .width("100%")
-                        .fontSize(14)
-                        .maxLines(1)
-                        .margin({bottom: 20})
-                        .textOverflow({overflow:TextOverflow.Ellipsis})
+                        .width("100%").fontSize(14).maxLines(1)
+                        .margin({ bottom: 20 })
+                        .textOverflow({ overflow: TextOverflow.Ellipsis })
 
-                      //下边
-                      Row(){
-                        Text("￥"+item.price)
-                          .fontSize(14)
+                      Row() {
+                        Text("￥" + item.price).fontSize(14)
 
                         Row({ space: 10 }) {
+                          // 减号
                           Button("-")
-                            .width(24)
-                            .height(24)
-                            .padding(0)
-                            .backgroundColor(Color.White)
-                            .fontColor(Color.Red)
-                            .border({
-                              width: 1,
-                              color: Color.Red,
-                              style: BorderStyle.Solid
-                            })
+                            .width(24).height(24).padding(0)
+                            .backgroundColor(Color.White).fontColor(Color.Red)
+                            .border({ width: 1, color: Color.Red, style: BorderStyle.Solid })
                             .type(ButtonType.Circle)
                             .onClick(() => {
-                              // 数量减
-                              let i = this.count_arr[index];
-                              this.count_arr[index] = --i < 1 ? 1 : i;
-                              // 修改购物车数量 （调用防抖函数，不需要每次增减数量都调用接口， 只需要保证最后一次的数量提交）
-                              f(this.user_token, this.shopbag_list[index].sid, String(this.count_arr[index]))
+                              let currentCount = this.count_arr[index];
+                              if (currentCount > 1) {
+                                this.count_arr[index] = currentCount - 1;
+                                f(this.user_token, this.shopbag_list[index].sid, String(this.count_arr[index]))
+                              } else {
+                                AlertDialog.show({
+                                  title: '提示',
+                                  message: '确定要移除该商品吗？',
+                                  autoCancel: true,
+                                  alignment: DialogAlignment.Bottom,
+                                  offset: { dx: 0, dy: -20 },
+                                  primaryButton: { value: '取消', action: () => {} },
+                                  secondaryButton: {
+                                    value: '删除', fontColor: Color.Red,
+                                    action: () => { this.deleteItem(index); }
+                                  }
+                                })
+                              }
                             })
 
                           TextInput({ text: String(this.count_arr[index]) })
-                            .width(50)
-                            .type(InputType.Number)
-                            .textAlign(TextAlign.Center)
-                            .backgroundColor(Color.White)
-                            .padding(0)
+                            .width(50).type(InputType.Number).textAlign(TextAlign.Center)
+                            .backgroundColor(Color.White).padding(0)
                             .onChange((v: string) => {
-                              if(new RegExp(/^0/).test(v)){
-                                v = v.slice(0,-1)
-                              }
+                              if (new RegExp(/^0/).test(v)) v = v.slice(0, -1);
                               this.count_arr[index] = Number(v) ? Number(v) : 1;
-                              // 非空字符串才可以提交
-                              if(v){
-                                // 修改购物车数量 （调用防抖函数，不需要每次增减数量都调用接口， 只需要保证最后一次的数量提交）
-                                f(this.user_token, this.shopbag_list[index].sid, String(this.count_arr[index]))
-                              }
+                              if(v) f(this.user_token, this.shopbag_list[index].sid, String(this.count_arr[index]));
                             })
-                            // 如果输入框失去焦点，没有数量，数量初始化为1
                             .onBlur(() => {
-                              if(!this.count_arr[index]){
-                                this.count_arr[index] = 1;
-                              }
+                              if (!this.count_arr[index]) this.count_arr[index] = 1;
                             })
 
+                          // 加号
                           Button("+")
-                            .width(24)
-                            .height(24)
-                            .padding(0)
-                            .backgroundColor(Color.Red)
-                            .type(ButtonType.Circle)
+                            .width(24).height(24).padding(0)
+                            .backgroundColor(Color.Red).type(ButtonType.Circle)
                             .onClick(() => {
-                              // 数量+
-                              let i:number = this.count_arr[index];
+                              let i = this.count_arr[index];
                               this.count_arr[index] = ++i;
-                              // 修改购物车数量 （调用防抖函数，不需要每次增减数量都调用接口， 只需要保证最后一次的数量提交）
                               f(this.user_token, this.shopbag_list[index].sid, String(this.count_arr[index]))
                             })
                         }
                       }
-                      .width("100%")
-                      .justifyContent(FlexAlign.SpaceBetween)
-
+                      .width("100%").justifyContent(FlexAlign.SpaceBetween)
                     }
-                    .layoutWeight(1)
-                    .alignItems(HorizontalAlign.Start)
+                    .layoutWeight(1).alignItems(HorizontalAlign.Start)
                   }
-                  .padding(10)
-                  .backgroundColor(Color.White)
-                }.swipeAction({
-                  // 设置右边划出组件
-                  end: this.itemEnd(index, ()=>{
-                    console.log("当前删除的元素的下标是 =>", index)
-
-                    // 需要删除的购物车商品id: [sid1, sid2, sid3]
-                    let sids: string[] = [];
-                    // 把当前要删除的商品id, 存入数组中
-                    sids.push(this.shopbag_list[index].sid)
-
-                    // 删掉当前购物车商品
-                    removeShopcart(this.user_token, JSON.stringify(sids))
-                      .then( res=>{
-                        console.log("删除购物车商品 =>", JSON.stringify(Object(res).result));
-
-                        // 接口调用成功， 数据已经删除
-                        if(Object(res).result.code == 7000){
-                            // 同步本地购物车列表
-                            this.shopbag_list.splice(index, 1)
-                        }
-                      })
-                  }),
+                  .padding(10).backgroundColor(Color.White)
+                }
+                .swipeAction({
+                  end: this.itemEnd(index, () => { this.deleteItem(index) }),
                   edgeEffect: SwipeEdgeEffect.Spring
                 })
               })
             }
-
           }
         }
       }
       .width("100%")
       .height("calc(100% - 160.8vp)")
 
-      // 4. 提交订单
+      // 4. 底部结算栏
       Row({ space: 10 }) {
-        // 复选框
         Row() {
-          // 全选按钮
           CheckboxGroup({ group: "shopbagCheckBox" })
           Text("全选")
         }
-
-        // 价格
         Row() {
           Text("合计:")
           Text("￥0.00")
         }
-        .layoutWeight(1)
-        .justifyContent(FlexAlign.End)
+        .layoutWeight(1).justifyContent(FlexAlign.End)
 
         Button("提交订单")
           .linearGradient({
-            // 线性渐变
             angle: 90,
-            colors: [
-              [0xfe5d33, 0.2],
-              [0xee0d26, 1.0]
-            ]
+            colors: [[0xfe5d33, 0.2], [0xee0d26, 1.0]]
           })
       }
       .padding({ left: 10, right: 10 })
       .backgroundColor(Color.White)
     }
-
     .height("100%")
     .backgroundColor(0xefefef)
+    // =================================================================
+    // 【关键修复】使用 onVisibleAreaChange 监听组件是否可见
+    // 只要组件出现在屏幕上（比例>0.8），就触发刷新。完美解决Tab切换问题。
+    // =================================================================
+    .onVisibleAreaChange([0.0, 1.0], (isVisible: boolean, currentRatio: number) => {
+      // 当组件完全可见时，并且没有正在刷新，则执行刷新
+      if (isVisible && currentRatio >= 1.0 && !this.isRefreshing) {
+        console.log("ShopBag 可见，触发自动刷新");
+        this.initData();
+      }
+    })
   }
 }

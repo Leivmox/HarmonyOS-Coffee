@@ -1,9 +1,9 @@
 //导入数据接口
-import { menuSideBar,menuProductList } from "../api/api"
+import { menuProductList, menuSideBar } from '../api/api';
 
 //导入类型约束
-import { sideBarItem,productItem } from "../model/model"
-import { router } from "@kit.ArkUI";
+import { productItem, sideBarItem } from '../model/model';
+import { router } from '@kit.ArkUI';
 
 //自定义组件 -- 菜单
 @Component
@@ -36,19 +36,26 @@ export default struct MenuPage {
   }
 
   //获取当前分类的商品
-  private getProductListByMenu(){
+  private getProductListByMenu() {
+    // 增加安全判断：防止 sideBarList 还没加载完就报错
+    if (!this.sideBarList || this.sideBarList.length === 0) {
+      return;
+    }
     //当前要获取的类型的商品
     let type = this.sideBarList[this.currentSideBarIndex].type
     //参数：商品分类
     menuProductList(type)
-      .then( res=>{
+      .then(res => {
         // 获取到商品数据
         let productList: productItem[] = Object(res).result.result;
         // 赋值给状态变量
         this.productList = productList;
-        console.log("当前${type}类型的商品有: ${this.productList}")
+        // console.log("当前${type}类型的商品有: ${this.productList}")
+        // ✅ 正确写法：使用反引号 `` 和 JSON.stringify
+        console.log(`当前${type}类型的商品有: ${JSON.stringify(this.productList)}`);
       })
   }
+
   //页面结构
   build() {
     Column() {
@@ -67,12 +74,12 @@ export default struct MenuPage {
               .width("100%")
               .height(50)
               .padding({ left: 20 })
-              .backgroundColor( this.currentSideBarIndex == index? Color.White : Color.Transparent)
+              .backgroundColor(this.currentSideBarIndex == index ? Color.White : Color.Transparent)
               .border({
                 width: { left: 5 },
-                color: this.currentSideBarIndex == index? $r("app.color.theme_color") : Color.Transparent
+                color: this.currentSideBarIndex == index ? $r("app.color.theme_color") : Color.Transparent
               })
-              .onClick( () => {
+              .onClick(() => {
                 //点击的菜单的下标，赋值给 currentSideBarIndex
                 this.currentSideBarIndex = index
                 //切换菜单，重新获取当前分类的商品
@@ -113,13 +120,13 @@ export default struct MenuPage {
               .padding({ bottom: 10 })
               .alignItems(HorizontalAlign.Start)
               .backgroundColor(Color.White)
-              .onClick(()=>{
+              .onClick(() => {
                 // 页面跳转
                 router.pushUrl({
-                  url:"pages/DetailPage",
+                  url: "pages/DetailPage",
                   //路由参数
-                  params:{
-                    pid:item.pid
+                  params: {
+                    pid: item.pid
                   }
                 })
               })
