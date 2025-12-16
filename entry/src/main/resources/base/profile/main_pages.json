@@ -8,6 +8,8 @@
     "pages/PersonalInfo",
     "pages/SafetyCenter",
     "pages/AddressManage",
-    "pages/AddressAdd"
+    "pages/AddressAdd",
+    "pages/AddressEdit",
+    "pages/TestToken"
   ]
 }

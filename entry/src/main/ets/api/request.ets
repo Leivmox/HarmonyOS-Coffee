@@ -29,44 +29,63 @@ function queryString(obj: object) {
  * @param params 请求参数
  */
 export function request(url: string, method: string, params: object) {
-  //2.创建一个请求实例(一个请求实例对应一个网络请求，请求完成，对应的实例要销毁)
   let httpRequest = http.createHttp();
 
-  //添加通用appkey请求参数
-  Object(params).appkey = APPKEY;
-  console.log("请求参数 =>", JSON.stringify(Object(params)))
+  // =========================================================
+  // 【修复 1：ArkTS 不支持对象扩展运算符 ...params】
+  // 替代方案：手动创建一个新对象，并将 params 的属性复制进去
+  // =========================================================
 
-  //请求参数
-  let param: object | string = params;
+  let requestParams: Record<string, Object> = {};
 
-  //如果是post请求，需要序列化请求参数：{参数1：值，参数2：值，参数3：值...}=>"参数1=值& 参数2=值& 参数3=值&”
-  if (method == "post") {
-    param = queryString(params)
+  // 1. 将传入的 params 断言为 Record 类型以便遍历
+  let srcParams = params as Record<string, Object>;
+
+  // 2. 遍历 key 进行复制 (替代 ...params)
+  let keys = Object.keys(srcParams);
+  for (let key of keys) {
+    requestParams[key] = srcParams[key];
   }
 
-  //3.用请求实例 发起网络请求 => 请求实例.request("api",配置对象)
-  return httpRequest.request(BASEURL + url, {
-    //请求方式 get/ post/ put请求
-    method: method == "get" ? http.RequestMethod.GET : http.RequestMethod.POST,
-    //请求头
+  // 3. 添加 appkey
+  requestParams['appkey'] = APPKEY;
+
+  console.info(`[HTTP] 请求: ${url}, 方式: ${method}, 参数: ${JSON.stringify(requestParams)}`);
+
+  // =========================================================
+  // 【修复 2：区分 GET 和 POST 的参数发送位置】
+  // =========================================================
+
+  let fullUrl = BASEURL + url;
+  let finalExtraData: string | Object | undefined = undefined;
+
+  if (method.toLowerCase() === "get") {
+    // GET 请求：参数拼接到 URL 后面
+    const strParam = queryString(requestParams);
+    if (strParam) {
+      // 判断 url 是否已经包含了 '?'
+      if (fullUrl.includes('?')) {
+        fullUrl += `&${strParam}`;
+      } else {
+        fullUrl += `?${strParam}`;
+      }
+    }
+    // GET 请求 extraData 必须为空 (undefined)
+  } else {
+    // POST 请求：参数序列化后放在 extraData 中
+    finalExtraData = queryString(requestParams);
+  }
+
+  // 发起请求
+  return httpRequest.request(fullUrl, {
+    method: method.toLowerCase() === "get" ? http.RequestMethod.GET : http.RequestMethod.POST,
     header: {
-      //在本项目，post请求的参数，以表单结构传递参数:参数1=值& 参数2=值& 参数3=值....
       "Content-Type": "application/x-www-form-urlencoded"
     },
-    //请求参数
-    extraData: param,
-    //返回的数据结构
+    extraData: finalExtraData,
     expectDataType: http.HttpDataType.OBJECT
   })
     .finally(() => {
-      //销毁网络请求实例
       httpRequest.destroy();
     })
-  /*
-  请求的结果 result 是一个 Promise对象
-  （Promise对象）
-    .then（(res）=>{res请求成功返回的数据 })
-    .catch( (err)=>{ err请求失败返回的失败信息  }）
-    .finally(()=>{请求完成执行的方法}）
-  */
 }

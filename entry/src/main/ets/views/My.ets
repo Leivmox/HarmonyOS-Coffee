@@ -93,10 +93,12 @@ export default struct My {
             left: 10,
             right: 10
           })
-          // .onClick(() => {
-          // 点击头部依然可以跳转登录（如果需要的话）
-          // router.pushUrl({ url: "pages/LoginPage" })
-          // })
+
+          .onClick(() => {
+            // 点击头部依然可以跳转登录（如果需要的话）
+            // router.pushUrl({ url: "pages/LoginPage" })
+            router.pushUrl({ url: "pages/TestToken" })
+          })
 
           // --- B. 功能列表 ---
           Column() {

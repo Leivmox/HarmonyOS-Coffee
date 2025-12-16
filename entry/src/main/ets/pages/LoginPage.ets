@@ -2,7 +2,7 @@
 import { userMsg } from '../model/model';
 //导入表单验证模块
 import { validForm } from '../utils/validForm';
-//导入及时反馈模块
+//导入及时反馈模/块
 import { PromptAction, router } from '@kit.ArkUI';
 //导入注册,登录接口
 import { login, register } from '../api/api';
@@ -238,29 +238,50 @@ struct LoginPage {
                   })
                   //登陆成功
                   if (Object(res).result.code == 200) {
-                    // 【关键修改 1】先保存 Token！
-                    let key: string = "user_token";
-                    let val: string = Object(res).result.token
-                    // 【关键修改】传入 getContext(this) 确保上下文正确
-                    saveStorage(key, val, getContext(this));
+
+                    // // 【关键修改 1】先保存 Token！
+                    // let key: string = "user_token";
+                    // let val: string = Object(res).result.token
+                    // // 【关键修改】传入 getContext(this) 确保上下文正确
+                    // saveStorage(key, val, getContext(this));
+                    //
+                    // // ====================================================
+                    // // 2. 【新增】保存手机号
+                    // // ====================================================
+                    // // 直接使用 getContext(this)，不要用 context 变量
+                    // saveStorage("user_phone", this.userPhone, getContext(this));
+                    //
+                    // // ====================================================
+                    // // 3. 【新增】保存用户ID (生成假ID)
+                    // // ====================================================
+                    // let fakeId = "coffe" + new Date().getTime();
+                    // // 直接使用 getContext(this)
+                    // saveStorage("user_id", fakeId, getContext(this));
+                    //
+                    // // 确保数据写入 Storage
+                    // // saveStorage(key, val)
+                    // console.log("Token已保存，准备跳转");
+                    // 获取后端返回的 token
+                    let tokenVal: string = Object(res).result.token;
 
                     // ====================================================
-                    // 2. 【新增】保存手机号
+                    // 【关键修复步骤】
+                    // 1. 存入 AppStorage，这是为了让 AddressAdd 页面能通过 @StorageProp('token') 拿到数据
+                    // 注意：这里的 Key 必须是 'token'，因为你在 AddressAdd 里写的是 @StorageProp('token')
                     // ====================================================
-                    // 直接使用 getContext(this)，不要用 context 变量
+                    AppStorage.setOrCreate('token', tokenVal);
+
+                    // 2. 持久化存储 (保存到本地文件，下次打开APP还在)
+                    // 你的 saveStorage 可能是封装的 Preferences
+                    saveStorage("user_token", tokenVal, getContext(this));
                     saveStorage("user_phone", this.userPhone, getContext(this));
 
-                    // ====================================================
-                    // 3. 【新增】保存用户ID (生成假ID)
-                    // ====================================================
-                    let fakeId = "coffe" + new Date().getTime();
-                    // 直接使用 getContext(this)
-                    saveStorage("user_id", fakeId, getContext(this));
+                    console.log("Token已写入AppStorage，值:", tokenVal);
 
-                    // 确保数据写入 Storage
-                    // saveStorage(key, val)
-                    console.log("Token已保存，准备跳转");
-
+                    // 跳转到首页 (或者跳转到测试页)
+                    // router.pushUrl({ url: "pages/Index" })
+                    // 为了测试，你可以暂时跳到 TestToken 页面，之后改回 Index
+                    // router.pushUrl({ url: "pages/TestToken" })
 
                     //跳转到首页router
                     router.pushUrl({

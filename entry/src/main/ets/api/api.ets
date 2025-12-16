@@ -268,3 +268,58 @@ export function findAccountInfo(token: string): Promise<http.HttpResponse> {
     tokenString: token
   }))
 }
+
+/**
+ * @description 新增地址接口
+ * 请求地址：http://apis.netstart.cn/coffee/addAddress
+ * 请求类型： POST
+ */
+export interface AddressParams {
+  tokenString: string;
+  name: string;
+  tel: string;
+  province: string;
+  city: string;
+  county: string;
+  addressDetail: string;
+  areaCode: string;
+  postalCode: string;
+  isDefault: number; // 0 or 1
+}
+
+export function addAddress(params: AddressParams): Promise<http.HttpResponse> {
+  return request("/addAddress", "post", params);
+}
+/**
+ * @description 查询地址接口
+ * 请求地址：http://apis.netstart.cn/coffee/findAddress
+ * 请求类型： GET
+ * @param token: 用户token
+ */
+export function findAddress(token: string): Promise<http.HttpResponse> {
+  // 根据文档，参数名是 tokenString
+  return request("/findAddress", "get", Object({
+    tokenString: token
+  }))
+}
+
+// 1. 根据aid查询地址详情 (用于回显数据)
+export function findAddressByAid(aid: string, token: string): Promise<http.HttpResponse> {
+  return request("/findAddressByAid", "get", Object({
+    aid: aid,
+    tokenString: token
+  }))
+}
+
+// 2. 编辑地址接口 (保存修改)
+export function editAddress(params: Object): Promise<http.HttpResponse> {
+  return request("/editAddress", "post", params)
+}
+
+// 3. 删除地址接口
+export function deleteAddress(aid: string, token: string): Promise<http.HttpResponse> {
+  return request("/deleteAddress", "post", Object({
+    aid: aid,
+    tokenString: token
+  }))
+}
