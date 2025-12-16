@@ -1,6 +1,6 @@
 //网络请求接口
-import { http } from "@kit.NetworkKit";
-import { request } from "./request";
+import { http } from '@kit.NetworkKit';
+import { request } from './request';
 
 
 /**
@@ -173,12 +173,12 @@ export function findAllLike(token: string): Promise<http.HttpResponse> {
  * @param token 用户token
  * @returns
  */
-export function addShopcart(pid:string,count:string,rule:string,token:string):Promise<http.HttpResponse>{
-  return request("/addShopcart","post",Object({
+export function addShopcart(pid: string, count: string, rule: string, token: string): Promise<http.HttpResponse> {
+  return request("/addShopcart", "post", Object({
     pid,
     count,
     rule,
-    tokenString:token
+    tokenString: token
   }))
 }
 
@@ -188,9 +188,9 @@ export function addShopcart(pid:string,count:string,rule:string,token:string):Pr
 // 请求参数： {
 //   tokenString: token字符串
 // }
-export function shopcartRows(token:string):Promise<http.HttpResponse>{
-  return request("/shopcartRows","get",Object({
-    tokenString:token
+export function shopcartRows(token: string): Promise<http.HttpResponse> {
+  return request("/shopcartRows", "get", Object({
+    tokenString: token
   }))
 }
 
@@ -200,9 +200,9 @@ export function shopcartRows(token:string):Promise<http.HttpResponse>{
 // 请求参数： {
 // tokenString: token字符串
 // }
-export function findAllShopcart(token:string):Promise<http.HttpResponse>{
-  return request("/findAllShopcart","get",Object({
-    tokenString:token
+export function findAllShopcart(token: string): Promise<http.HttpResponse> {
+  return request("/findAllShopcart", "get", Object({
+    tokenString: token
   }))
 }
 
@@ -216,9 +216,9 @@ export function findAllShopcart(token:string):Promise<http.HttpResponse>{
 //   count: 商品数量
 // }
 
-export function modifyShopcartCount(token:string,sid:string,count:string):Promise<http.HttpResponse>{
-  return request("/modifyShopcartCount","post",Object({
-    tokenString:token,
+export function modifyShopcartCount(token: string, sid: string, count: string): Promise<http.HttpResponse> {
+  return request("/modifyShopcartCount", "post", Object({
+    tokenString: token,
     sid,
     count
   }))
@@ -234,8 +234,8 @@ export function modifyShopcartCount(token:string,sid:string,count:string):Promis
 // }
 //
 // 其中 sids 值为 JSON.stringify([sid1, sid2, sid3])
-export function removeShopcart(token:string, sids:string ):Promise<http.HttpResponse>{
-  return request("/removeShopcart","post", Object({
+export function removeShopcart(token: string, sids: string): Promise<http.HttpResponse> {
+  return request("/removeShopcart", "post", Object({
     tokenString: token,
     sids
   }))

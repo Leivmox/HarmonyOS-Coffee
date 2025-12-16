@@ -243,7 +243,7 @@ struct LoginPage {
                     let key: string = "user_token";
                     let val: string = Object(res).result.token
                     // 【关键修改】传入 getContext(this) 确保上下文正确
-                    // saveStorage(key, val, getContext(this));
+                    saveStorage(key, val, getContext(this));
 
                     // ====================================================
                     // 2. 【新增】保存手机号
