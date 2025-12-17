@@ -109,9 +109,9 @@ export default struct My {
         }
         .width('95%')
         // 半透明背景
-        .backgroundColor('rgba(255, 255, 255, 0.8)')
+        .backgroundColor('rgba(255, 255, 255, 1)')
         // 毛玻璃效果(可选，会让背景图透过来时更好看)
-        .backdropBlur(10)
+        // .backdropBlur(10)
         .borderRadius(12)
         .shadow({ radius: 10, color: '#1A000000', offsetY: 5 })
         .padding({ left: 15, right: 15, bottom: 10 })
