@@ -1,0 +1,9 @@
+# 强制认为是文本文件 (text)
+# 强制显式统计 (detectable)
+# 强制识别为 TypeScript
+*.ets text linguist-language=TypeScript linguist-detectable=true
+*.ts  text linguist-language=TypeScript linguist-detectable=true
+
+# 忽略干扰项 (可选，但建议加上)
+*.json linguist-vendored
+*.png linguist-vendored
