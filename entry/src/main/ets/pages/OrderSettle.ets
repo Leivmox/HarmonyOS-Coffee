@@ -3,6 +3,11 @@ import { shopBagItem } from '../model/model';
 import { getStorage } from '../utils/storage';
 import { deleteShopCart, findAddress, pay } from '../api/api';
 
+/**
+ * 提交订单页面
+ *
+ * @author Leivmox
+ */
 // 定义地址接口
 interface AddressItem {
   id: number | string;

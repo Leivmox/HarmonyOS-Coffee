@@ -1,6 +1,11 @@
 import { promptAction, router } from '@kit.ArkUI';
 import { deleteAddress, editAddress, findAddressByAid } from '../api/api';
 
+/**
+ * 编辑地址页面
+ *
+ * @author Leivmox
+ */
 @Entry
 @Component
 struct AddressEdit {

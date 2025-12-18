@@ -4,6 +4,11 @@ import { saveStorage, getStorage } from '../utils/storage';
 import { validForm } from '../utils/validform';
 import { userMsg } from '../model/model';
 
+/**
+ * 安全中心页面
+ *
+ * @author Leivmox
+ */
 interface ResultData {
   code: number;
   msg: string;
@@ -172,7 +177,28 @@ struct SafetyCenter {
         this.newPassword = "";
         this.isShowSheet = true;
       } else if (title === "注销账号") {
-        this.promptAction.showToast({ message: "请联系客服注销" })
+        AlertDialog.show({
+          title: '注销账号',
+          message: '是否确认注销账号，一旦确认无法恢复!',
+          autoCancel: true,
+          alignment: DialogAlignment.Center,
+          offset: { dx: 0, dy: -20 },
+          primaryButton: {
+            value: '取消',
+            fontColor: '#666666',
+            action: () => {
+              // 点击取消，不做任何操作
+            }
+          },
+          secondaryButton: {
+            value: '确认',
+            fontColor: '#0C34BA',
+            action: () => {
+              // 点击确认后，弹出提示
+              this.promptAction.showToast({ message: "请联系客服注销" })
+            }
+          }
+        })
       }
     })
     if (!isLast) {

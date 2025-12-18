@@ -4,6 +4,11 @@ import { http } from '@kit.NetworkKit';
 import { ApiResponse, findAccountInfo, updateDesc, updateNickName, UserInfo } from '../api/api';
 import { getStorage } from '../utils/storage';
 
+/**
+ * 个人资料页面
+ *
+ * @author Leivmox
+ */
 
 @Entry
 @Component

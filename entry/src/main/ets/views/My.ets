@@ -2,6 +2,11 @@ import { router, promptAction } from '@kit.ArkUI';
 import { getStorage } from '../utils/storage';
 import { findAccountInfo, ApiResponse, UserInfo } from '../api/api';
 
+/**
+ * "我的"页面
+ *
+ * @author Leivmox
+ */
 @Component
 export default struct My {
   // 1. 全局 Token

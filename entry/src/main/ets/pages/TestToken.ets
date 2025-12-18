@@ -3,6 +3,11 @@ import { router, promptAction } from '@kit.ArkUI';
 import { addAddress, AddressParams } from '../api/api';
 import { BusinessError } from '@kit.BasicServicesKit';
 
+/**
+ * Token获取测试
+ *
+ * @author Leivmox
+ */
 @Entry
 @Component
 struct TestToken {

@@ -4,6 +4,11 @@ import { findAllLike, toggleLike } from '../api/api';
 import { productItem } from '../model/model';
 import { BusinessError } from '@kit.BasicServicesKit';
 
+/**
+ * 我的收藏页面
+ *
+ * @author Leivmox
+ */
 @Entry
 @Component
 struct MyCollect {

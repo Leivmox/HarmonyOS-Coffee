@@ -1,7 +1,11 @@
 import { promptAction, router } from '@kit.ArkUI';
 import { addAddress, AddressParams } from '../api/api'; // 确保路径正确
 import { BusinessError } from '@kit.BasicServicesKit';
-
+/**
+ * 添加地址页面
+ *
+ * @author Leivmox
+ */
 @Entry
 @Component
 struct AddressAdd {
@@ -13,7 +17,7 @@ struct AddressAdd {
   @State postalCode: string = '';
   @State isDefault: boolean = false;
   // 地区相关变量
-  @State regionText: string = ''; // 用于显示： "广东省 广州市 天河区"
+  @State regionText: string = '';
   // 提交给后端的字段
   private province: string = '';
   private city: string = '';
@@ -21,11 +25,10 @@ struct AddressAdd {
   private areaCode: string = '000000'; // 默认或根据选择器获取
 
   // --- 逻辑方法 ---
-
   // 1. 选择地区 (模拟)
   selectRegion() {
     TextPickerDialog.show({
-      range: ['北京市 北京市 东城区', '上海市 上海市 黄浦区', '广东省 广州市 天河区', '浙江省 杭州市 西湖区'],
+      range: ['湖南省 长沙市 芙蓉区', '湖北省 宜昌市 三峡区', '广东省 广州市 天河区', '浙江省 杭州市 西湖区'],
       onAccept: (value: TextPickerResult) => {
         // 拿到选择的字符串
         this.regionText = value.value as string;
@@ -114,7 +117,6 @@ struct AddressAdd {
   }
 
   // --- UI 构建 ---
-  // 通用输入行样式封装
   @Builder
   InputRow(title: string, placeholder: string, text: string, onChange: (val: string) => void) {
     Row() {
@@ -135,7 +137,8 @@ struct AddressAdd {
     .height(55)
     .width('100%')
     .alignItems(VerticalAlign.Center)
-    .border({ width: { bottom: 0.5 }, color: '#EEE' }) // 底部细分割线
+    // 底部细分割线
+    .border({ width: { bottom: 0.5 }, color: '#EEE' })
   }
 
   build() {
@@ -168,10 +171,10 @@ struct AddressAdd {
       // 2. 表单内容区域
       Column() {
         // 姓名
-        this.InputRow('姓名', '请输入姓名', this.name, (val) => this.name = val)
+        this.InputRow('姓名', '姓名', this.name, (val) => this.name = val)
 
         // 电话
-        this.InputRow('电话', '请输入手机号', this.phone, (val) => this.phone = val)
+        this.InputRow('电话', '电话', this.phone, (val) => this.phone = val)
 
         // 地区选择
         Row() {
@@ -180,7 +183,7 @@ struct AddressAdd {
             .fontSize(16)
             .fontColor('#333')
 
-          Text(this.regionText || '请选择省市区')
+          Text(this.regionText || '地区')
             .fontSize(16)
             .fontColor(this.regionText ? '#333' : '#ccc')
             .layoutWeight(1)
@@ -199,7 +202,7 @@ struct AddressAdd {
         })
 
         // 详细地址
-        this.InputRow('详细地址', '街道门牌、楼层房间号等信息', this.detail, (val) => this.detail = val)
+        this.InputRow('详细地址', '详细地址', this.detail, (val) => this.detail = val)
 
         // 邮政编码
         Row() {

@@ -3,6 +3,11 @@ import { findAddress } from '../api/api';
 import { BusinessError } from '@kit.BasicServicesKit';
 import { getStorage } from '../utils/storage'; // 1. 导入读取工具
 
+/**
+ * 地址管理页面
+ *
+ * @author Leivmox
+ */
 interface AddressItem {
   id: number | string;
   name: string;
