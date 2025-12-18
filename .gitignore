@@ -23,6 +23,7 @@ build/
 entry/build/
 entry/.cxx/
 entry/.preview/
+.appanalyzer/
 
 # 注意：hvigorfile.ts 是构建脚本，必须提交！
 # /entry/hvigorfile.ts <-- 已注释，绝对不能忽略，否则别人无法运行
