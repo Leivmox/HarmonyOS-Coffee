@@ -244,7 +244,7 @@ struct PersonalInfo {
             // --- 头像 ---
             Row() {
               Text("头像").fontSize(15).fontColor('#333')
-              Image($r('app.media.luckin'))
+              Image($r('app.media.avator1'))
                 .width(50).height(50).borderRadius(25)
                 .objectFit(ImageFit.Cover).backgroundColor('#eee')
             }
