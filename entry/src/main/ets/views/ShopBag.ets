@@ -293,6 +293,32 @@ export default struct ShopBag {
             angle: 90,
             colors: [[0xfe5d33, 0.2], [0xee0d26, 1.0]]
           })
+          .onClick(() => {
+            // 1. 检查购物车是否为空
+            if (this.shopbag_list.length === 0) {
+              promptAction.showToast({ message: '购物车是空的' });
+              return;
+            }
+
+            // 2. 计算总金额
+            // 遍历购物车列表，累加 (单价 * 数量)
+            let total = 0;
+            this.shopbag_list.forEach((item, index) => {
+              // 强制转为数字进行计算，防止字符串拼接错误
+              let price = Number(item.price);
+              let count = this.count_arr[index];
+              total += price * count;
+            });
+
+            // 3. 跳转到结算页并传递参数
+            router.pushUrl({
+              url: "pages/OrderSettle",
+              params: {
+                list: this.shopbag_list,  // 传递当前的商品列表数据
+                total: total.toFixed(2)   // 传递计算好的总价(保留两位小数)
+              }
+            })
+          })
       }
       .padding({ left: 10, right: 10 })
       .backgroundColor(Color.White)
