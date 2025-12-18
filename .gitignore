@@ -1,50 +1,52 @@
 # ======================================
-# Node / JS / TS 依赖
+# Node / JS / TS 依赖 (不要忽略 lock 文件！)
 # ======================================
-/node_modules
-/.npm
-/.yarn
-/.pnp.*
-/package-lock.json
-/yarn.lock
+node_modules/
+.npm/
+.yarn/
+.pnp.*
+
+# 注意：强烈建议保留 package-lock.json 或 yarn.lock
+# 它们能锁定依赖版本，保证团队协作环境一致
+# /package-lock.json  <-- 已注释，不要忽略
+# /yarn.lock          <-- 已注释，不要忽略
 
 # ======================================
-# DevEco/HarmonyOS 依赖 & 构建
+# DevEco/HarmonyOS 依赖 & 构建 (核心垃圾文件)
 # ======================================
-/oh_modules
-/.ohpm                # DevEco ohpm 缓存目录
-**/build               # 编译生成的 build 文件夹
-/.hvigor               # hvigor 构建缓存
-/entry/obfuscation-rules.txt
-/entry/hvigorfile.ts
-/hvigor/
-*.o
-*.so
+oh_modules/
+.ohpm/
+.hvigor/
+.cxx/
+.preview/
+build/
+entry/build/
+entry/.cxx/
+entry/.preview/
+
+# 注意：hvigorfile.ts 是构建脚本，必须提交！
+# /entry/hvigorfile.ts <-- 已注释，绝对不能忽略，否则别人无法运行
+
+# 混淆规则通常也建议提交，保证发布版本一致
+# /entry/obfuscation-rules.txt <-- 已注释，建议保留
 
 # ======================================
-# 本地配置 & IDE 文件
+# 本地配置 & IDE 文件 (个人相关)
 # ======================================
-/.local.properties
-/.idea
-/.vscode
-/.DS_Store
-/.clangd
-/.clang-format
-/.clang-tidy
+local.properties
+.local.properties
+.idea/
+.vscode/
+.DS_Store
+*.swp
+*.swo
 
 # ======================================
-# 测试文件 & 临时文件
+# 临时文件 & 日志
 # ======================================
-**/.test
-**/*.test.ets
-/entry/mock/
 *.log
 *.tmp
 *.bak
-
-# ======================================
-# HarmonyOS 临时或自动生成资源
-# ======================================
-**/dist/
-**/temp/
-**/__pycache__/
+dist/
+temp/
+__pycache__/
