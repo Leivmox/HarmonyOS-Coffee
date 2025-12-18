@@ -11,6 +11,7 @@
     "pages/AddressAdd",
     "pages/AddressEdit",
     "pages/TestToken",
-    "pages/OrderSettle"
+    "pages/OrderSettle",
+    "pages/MyOrders"
   ]
 }

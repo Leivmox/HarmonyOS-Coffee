@@ -17,19 +17,56 @@ let f = debounce((token: string, sid: string, count: string) => {
     })
 }, 500);
 
-
 @Entry
 @Component
 export default struct ShopBag {
+  // 购物车数据
   @State shopbag_list: shopBagItem[] = [];
+  // 数量数组 (用于本地快速响应UI)
   @State count_arr: number[] = [];
+  // Token
   @State user_token: string = "";
 
-  // 添加一个标记，防止短时间内重复刷新
+  // 【关键】选中状态数组，true代表选中，false代表未选
+  @State select_arr: boolean[] = [];
+  // 【关键】总金额
+  @State totalPrice: string = "0.00";
+  // 【关键】全选状态
+  @State isAllSelected: boolean = false;
+
+  // 防止重复刷新
   private isRefreshing: boolean = false;
 
   /**
-   * 删除功能封装
+   * 核心算法：计算总价
+   * 只有当 select_arr[i] 为 true 时，才计算该商品价格
+   */
+  calcTotal() {
+    let total = 0;
+    this.shopbag_list.forEach((item, index) => {
+      // 1. 必须是选中的
+      if (this.select_arr[index]) {
+        // 2. 价格转数字
+        let price = parseFloat(item.price as string) || 0;
+        // 3. 数量取本地数组
+        let count = this.count_arr[index] || 1;
+
+        total += price * count;
+      }
+    });
+    // 保留2位小数
+    this.totalPrice = total.toFixed(2);
+
+    // 顺便检查全选状态
+    if (this.select_arr.length > 0) {
+      this.isAllSelected = this.select_arr.every(val => val === true);
+    } else {
+      this.isAllSelected = false;
+    }
+  }
+
+  /**
+   * 删除功能
    */
   deleteItem(index: number) {
     if (!this.shopbag_list[index]) return;
@@ -40,11 +77,13 @@ export default struct ShopBag {
     removeShopcart(this.user_token, JSON.stringify(sids))
       .then(res => {
         let resBody = res.result as Record<string, Object>;
-        console.log("删除结果 =>", JSON.stringify(resBody));
-
         if ((resBody['code'] as number) == 7000) {
+          // 删除数据
           this.shopbag_list.splice(index, 1);
           this.count_arr.splice(index, 1);
+          this.select_arr.splice(index, 1);
+          // 重新计算价格
+          this.calcTotal();
           promptAction.showToast({ message: '删除成功' });
         }
       })
@@ -64,29 +103,29 @@ export default struct ShopBag {
       .onClick(onClick)
   }
 
-  // 获取购物车商品
+  // 获取数据
   private findAllShopcart() {
     if (this.user_token.length) {
-      // 标记正在刷新
       this.isRefreshing = true;
-
       findAllShopcart(this.user_token)
         .then(res => {
           let responseBody = res.result as Record<string, Object>;
           let listData = responseBody['result'] as shopBagItem[];
 
-          // 强制覆盖数据
           this.shopbag_list = listData ? listData : [];
-          console.log("购物车数据成功加载 =>", JSON.stringify(this.shopbag_list))
 
-          // 初始化数量数组
+          // 1. 初始化数量
           let count_arr: number[] = this.shopbag_list.map((v: shopBagItem) => {
             return Number(v.count);
           })
           this.count_arr = count_arr;
-        })
-        .catch((err: Error) => {
-          console.error("获取购物车失败:", JSON.stringify(err));
+
+          // 2. 初始化选中状态 (默认全部不选)
+          this.select_arr = new Array(this.shopbag_list.length).fill(false);
+
+          // 3. 重置价格
+          this.totalPrice = "0.00";
+          this.isAllSelected = false;
         })
         .finally(() => {
           this.isRefreshing = false;
@@ -94,47 +133,31 @@ export default struct ShopBag {
     }
   }
 
-  /**
-   * 统一的数据初始化方法
-   */
   initData() {
-    // 1. 获取 Token
     let token = getStorage("user_token", getContext(this));
     this.user_token = token ? token.toString() : "";
-
-    console.log("ShopBag 尝试刷新数据, Token:", this.user_token);
-
-    // 2. 如果有 token，请求数据
     if (this.user_token) {
       this.findAllShopcart();
     } else {
       this.shopbag_list = [];
       this.count_arr = [];
+      this.select_arr = [];
     }
   }
 
-  // 1. 保留 onPageShow，以防你是通过 router 跳转进来的
   onPageShow() {
-    console.log("ShopBag onPageShow 触发");
-    this.initData();
-  }
-
-  // 2. 页面首次加载
-  aboutToAppear() {
-    console.log("ShopBag aboutToAppear 触发");
     this.initData();
   }
 
   build() {
     Column() {
+      // ===========================
       // 1. 顶部导航
+      // ===========================
       Row() {
         Text("< 返回").fontColor($r("app.color.theme_color"))
           .onClick(() => { router.back() })
-
         Text("购物袋")
-
-        // 【新增】手动刷新按钮，防止自动刷新失效时可以用
         Text("刷新").fontColor($r("app.color.theme_color"))
           .onClick(() => {
             this.initData();
@@ -147,113 +170,106 @@ export default struct ShopBag {
       .justifyContent(FlexAlign.SpaceBetween)
       .backgroundColor(Color.White)
 
-      // 2. 背景
+      // ===========================
+      // 2. 背景图片
+      // ===========================
       Image($r("app.media.shopbag_bg")).width("100%")
 
+      // ===========================
       // 3. 列表区域
+      // ===========================
       Scroll() {
-        // === 修改点 A：Column ===
         Column() {
           if (!this.user_token.length) {
             Row() {
               Text("还未登录，先")
-              Text("登录")
-                .fontColor($r("app.color.theme_color"))
-                .onClick(() => {
-                  router.pushUrl({ url: "pages/LoginPage" })
-                })
+              Text("登录").fontColor($r("app.color.theme_color"))
+                .onClick(() => { router.pushUrl({ url: "pages/LoginPage" }) })
             }
-            // 未登录提示也会自动居中，不需要 margin-top 了
+            .margin({top: 20})
           }
           else if (!this.shopbag_list.length) {
-            // === 修改点 B：空状态居中 ===
             Column() {
-              Text("目前还没有商品 (点击右上角刷新试试)")
-                .fontColor(Color.Gray)
-                .fontSize(14)
-                .textAlign(TextAlign.Center)
+              Image($r("app.media.Null")).width(100).height(100).opacity(0.5).margin({bottom:10})
+              Text("购物车空空如也").fontColor(Color.Gray).fontSize(14)
             }
-            .width('100%')
-            .justifyContent(FlexAlign.Center)
-            .alignItems(HorizontalAlign.Center)
+            .width('100%').justifyContent(FlexAlign.Center).alignItems(HorizontalAlign.Center)
           }
           else {
             List() {
               ForEach(this.shopbag_list, (item: shopBagItem, index: number) => {
                 ListItem() {
                   Row({ space: 10 }) {
-                    Checkbox({ group: "shopbagCheckBox" })
-                    Image(item.small_img).width(90).height(90)
+                    // --- 单选框 Checkbox ---
+                    Checkbox({ name: 'item'+index })
+                      .select(this.select_arr[index]) // 绑定选中状态
+                      .onChange((value: boolean) => {
+                        this.select_arr[index] = value; // 更新数组
+                        this.calcTotal(); // 🔥🔥🔥 重点：触发计算
+                      })
 
+                    // --- 商品图片 ---
+                    Image(item.small_img)
+                      .width(90).height(90)
+                      .borderRadius(4).objectFit(ImageFit.Cover)
+                      .backgroundColor('#f5f5f5')
+
+                    // --- 商品信息 ---
                     Column() {
                       Row() {
-                        Text(item.name).margin({ right: 20 }).fontSize(14)
-                        Text(item.rule).fontSize(14)
+                        Text(item.name)
+                          .fontSize(14).fontWeight(FontWeight.Bold)
+                          .maxLines(1).textOverflow({overflow: TextOverflow.Ellipsis})
+                          .layoutWeight(1)
                       }
-                      Text(item.enname)
-                        .width("100%").fontSize(14).maxLines(1)
-                        .margin({ bottom: 20 })
-                        .textOverflow({ overflow: TextOverflow.Ellipsis })
+
+                      Text(item.rule)
+                        .fontSize(12).fontColor('#999')
+                        .margin({ top: 4, bottom: 4 })
 
                       Row() {
-                        Text("￥" + item.price).fontSize(14)
+                        Text("￥" + item.price).fontSize(16).fontColor(Color.Red).fontWeight(FontWeight.Bold)
 
-                        Row({ space: 10 }) {
+                        // --- 加减按钮 ---
+                        Row({ space: 0 }) {
                           // 减号
                           Button("-")
-                            .width(24).height(24).padding(0)
-                            .backgroundColor(Color.White).fontColor(Color.Red)
-                            .border({ width: 1, color: Color.Red, style: BorderStyle.Solid })
-                            .type(ButtonType.Circle)
+                            .width(26).height(26).padding(0)
+                            .backgroundColor('#f5f5f5').fontColor('#333')
+                            .type(ButtonType.Normal).borderRadius({topLeft: 13, bottomLeft: 13})
                             .onClick(() => {
-                              let currentCount = this.count_arr[index];
-                              if (currentCount > 1) {
-                                this.count_arr[index] = currentCount - 1;
-                                f(this.user_token, this.shopbag_list[index].sid, String(this.count_arr[index]))
+                              if (this.count_arr[index] > 1) {
+                                this.count_arr[index]--;
+                                f(this.user_token, item.sid, String(this.count_arr[index]));
+                                this.calcTotal(); // 🔥🔥🔥 重点：触发计算
                               } else {
-                                AlertDialog.show({
-                                  title: '提示',
-                                  message: '确定要移除该商品吗？',
-                                  autoCancel: true,
-                                  alignment: DialogAlignment.Bottom,
-                                  offset: { dx: 0, dy: -20 },
-                                  primaryButton: { value: '取消', action: () => {} },
-                                  secondaryButton: {
-                                    value: '删除', fontColor: Color.Red,
-                                    action: () => { this.deleteItem(index); }
-                                  }
-                                })
+                                this.deleteItem(index);
                               }
                             })
 
-                          TextInput({ text: String(this.count_arr[index]) })
-                            .width(50).type(InputType.Number).textAlign(TextAlign.Center)
-                            .backgroundColor(Color.White).padding(0)
-                            .onChange((v: string) => {
-                              if (new RegExp(/^0/).test(v)) v = v.slice(0, -1);
-                              this.count_arr[index] = Number(v) ? Number(v) : 1;
-                              if(v) f(this.user_token, this.shopbag_list[index].sid, String(this.count_arr[index]));
-                            })
-                            .onBlur(() => {
-                              if (!this.count_arr[index]) this.count_arr[index] = 1;
-                            })
+                          // 数量
+                          Text(String(this.count_arr[index]))
+                            .width(36).height(26)
+                            .textAlign(TextAlign.Center).fontSize(13)
+                            .backgroundColor('#f5f5f5')
 
                           // 加号
                           Button("+")
-                            .width(24).height(24).padding(0)
-                            .backgroundColor(Color.Red).type(ButtonType.Circle)
+                            .width(26).height(26).padding(0)
+                            .backgroundColor('#f5f5f5').fontColor('#333')
+                            .type(ButtonType.Normal).borderRadius({topRight: 13, bottomRight: 13})
                             .onClick(() => {
-                              let i = this.count_arr[index];
-                              this.count_arr[index] = ++i;
-                              f(this.user_token, this.shopbag_list[index].sid, String(this.count_arr[index]))
+                              this.count_arr[index]++;
+                              f(this.user_token, item.sid, String(this.count_arr[index]));
+                              this.calcTotal(); // 🔥🔥🔥 重点：触发计算
                             })
                         }
                       }
                       .width("100%").justifyContent(FlexAlign.SpaceBetween)
                     }
-                    .layoutWeight(1).alignItems(HorizontalAlign.Start)
+                    .layoutWeight(1).alignItems(HorizontalAlign.Start).height(90).justifyContent(FlexAlign.SpaceBetween)
                   }
-                  .padding(10).backgroundColor(Color.White)
+                  .padding(10).backgroundColor(Color.White).margin({bottom: 10}).borderRadius(8)
                 }
                 .swipeAction({
                   end: this.itemEnd(index, () => { this.deleteItem(index) }),
@@ -263,75 +279,84 @@ export default struct ShopBag {
             }
           }
         }
-        .width("100%")
-        // === 修改点 C：核心居中逻辑 ===
-        // 1. 让内部 Column 最小高度占满 Scroll
         .constraintSize({ minHeight: '100%' })
-        // 2. 如果没有商品(长度为0)，则垂直居中；否则顶部对齐
         .justifyContent(this.shopbag_list.length === 0 ? FlexAlign.Center : FlexAlign.Start)
+        .padding({left: 10, right: 10, top: 10})
       }
-      .width("100%")
-      // 占据剩余所有高度
       .layoutWeight(1)
       .align(Alignment.Top)
+      .backgroundColor('#f5f5f5')
 
-
+      // ===========================
       // 4. 底部结算栏
-      Row({ space: 10 }) {
+      // ===========================
+      Row() {
         Row() {
-          CheckboxGroup({ group: "shopbagCheckBox" })
-          Text("全选")
-        }
-        Row() {
-          Text("合计:")
-          Text("￥0.00")
-        }
-        .layoutWeight(1).justifyContent(FlexAlign.End)
-
-        Button("提交订单")
-          .linearGradient({
-            angle: 90,
-            colors: [[0xfe5d33, 0.2], [0xee0d26, 1.0]]
-          })
-          .onClick(() => {
-            // 1. 检查购物车是否为空
-            if (this.shopbag_list.length === 0) {
-              promptAction.showToast({ message: '购物车是空的' });
-              return;
-            }
-
-            // 2. 计算总金额
-            // 遍历购物车列表，累加 (单价 * 数量)
-            let total = 0;
-            this.shopbag_list.forEach((item, index) => {
-              // 强制转为数字进行计算，防止字符串拼接错误
-              let price = Number(item.price);
-              let count = this.count_arr[index];
-              total += price * count;
-            });
-
-            // 3. 跳转到结算页并传递参数
-            router.pushUrl({
-              url: "pages/OrderSettle",
-              params: {
-                list: this.shopbag_list,  // 传递当前的商品列表数据
-                total: total.toFixed(2)   // 传递计算好的总价(保留两位小数)
+          // --- 全选 Checkbox ---
+          Checkbox({ name: 'all' })
+            .select(this.isAllSelected)
+            .onChange((value: boolean) => {
+              this.isAllSelected = value;
+              // 更新所有单独的选中状态
+              for (let i = 0; i < this.select_arr.length; i++) {
+                this.select_arr[i] = value;
               }
+              this.calcTotal(); // 🔥🔥🔥 重点：触发计算
             })
-          })
+          Text("全选").fontSize(14).fontColor('#333')
+        }
+
+        Row({ space: 10 }) {
+          Row() {
+            Text("合计: ").fontSize(14)
+            Text("￥" + this.totalPrice).fontSize(18).fontColor(Color.Red).fontWeight(FontWeight.Bold)
+          }
+
+          Button(`提交订单`)
+            .height(36)
+            .linearGradient({
+              angle: 90,
+              colors: [[0xfe5d33, 0.2], [0xee0d26, 1.0]]
+            })
+            .onClick(() => {
+              // 1. 过滤出选中的商品
+              let selectedItems: shopBagItem[] = [];
+              let finalTotal = 0;
+
+              this.shopbag_list.forEach((item, i) => {
+                if (this.select_arr[i]) {
+                  let currentItem = item;
+                  currentItem.count = this.count_arr[i];
+                  selectedItems.push(currentItem);
+                  finalTotal += Number(item.price) * this.count_arr[i];
+                }
+              });
+
+              if (selectedItems.length === 0) {
+                promptAction.showToast({ message: '请先选择要购买的商品' });
+                return;
+              }
+
+              // 2. 跳转到结算页
+              router.pushUrl({
+                url: "pages/OrderSettle",
+                params: {
+                  list: selectedItems,
+                  total: finalTotal.toFixed(2)
+                }
+              })
+            })
+        }
       }
-      .padding({ left: 10, right: 10 })
+      .width('100%')
+      .padding({ left: 15, right: 15, top: 10, bottom: 10 })
       .backgroundColor(Color.White)
+      .justifyContent(FlexAlign.SpaceBetween)
     }
     .height("100%")
-    .backgroundColor(0xefefef)
-    // =================================================================
-    // 【关键修复】使用 onVisibleAreaChange 监听组件是否可见
-    // =================================================================
+    .backgroundColor('#f5f5f5')
     .onVisibleAreaChange([0.0, 1.0], (isVisible: boolean, currentRatio: number) => {
-      // 当组件完全可见时，并且没有正在刷新，则执行刷新
       if (isVisible && currentRatio >= 1.0 && !this.isRefreshing) {
-        console.log("ShopBag 可见，触发自动刷新");
         this.initData();
       }
     })

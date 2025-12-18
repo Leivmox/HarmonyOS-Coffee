@@ -1,7 +1,7 @@
 import { router, promptAction } from '@kit.ArkUI';
 import { shopBagItem } from '../model/model';
-import { findAddress } from '../api/api';
 import { getStorage } from '../utils/storage';
+import { findAddress, pay, deleteShopCart } from '../api/api';
 
 // 定义地址接口
 interface AddressItem {
@@ -344,12 +344,55 @@ struct OrderSettle {
           .width('90%')
           .height(45)
           .margin({ top: 10, bottom: 10 })
-          .onClick(() => {
+          .onClick(async () => {
+            // 1. 校验地址
             if (!this.currentAddress) {
               promptAction.showToast({ message: '请先选择收货地址' });
               return;
             }
-            promptAction.showToast({ message: '支付功能开发中...' });
+
+            // 2. 提取购物车ID (sid)
+            let sids: string[] = [];
+            this.orderList.forEach(item => {
+              if (item.sid) {
+                sids.push(item.sid);
+              }
+            });
+
+            if (sids.length === 0) {
+              promptAction.showToast({ message: '订单数据异常' });
+              return;
+            }
+
+            try {
+              // 3. 调用结算接口 (在服务器创建订单)
+              // 注意：这里我们传入了地址对象里的信息
+              let payRes = await pay(
+                this.token,
+                sids,
+                this.currentAddress.phone,
+                this.currentAddress.address,
+                this.currentAddress.name
+              );
+
+              // 简单判断一下 code，具体根据实际接口返回调整
+              // 通常 code===200 或 '001' 表示成功，这里假设不报错就是成功
+              console.info('下单成功:', payRes.result);
+
+              // 4. 下单成功后，调用删除购物车接口 (清空已买商品)
+              await deleteShopCart(this.token, sids);
+
+              promptAction.showToast({ message: '支付成功，正在返回...' });
+
+              // 5. 延迟返回，给用户一点反应时间
+              setTimeout(() => {
+                router.back();
+              }, 800);
+
+            } catch (err) {
+              console.error('结算流程失败:', JSON.stringify(err));
+              promptAction.showToast({ message: '订单提交失败，请重试' });
+            }
           })
       }
       .width("100%")

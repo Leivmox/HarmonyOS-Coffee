@@ -375,3 +375,78 @@ export function updateDesc(token: string, newDesc: string): Promise<http.HttpRes
   }))
 }
 
+/**
+ * 立即结算接口 (相当于创建订单)
+ * 请求地址：http://apis.netstart.cn/coffee/pay
+ * @param token
+ * @param sids 购物车商品sid数组
+ * @param phone 手机号
+ * @param address 详细地址
+ * @param receiver 收货人姓名
+ */
+export function pay(token: string, sids: string[], phone: string, address: string, receiver: string): Promise<http.HttpResponse> {
+  // 将数组转为 JSON 字符串格式: "['sid1', 'sid2']"
+  let sidsStr = JSON.stringify(sids);
+
+  return request("/pay", "post", Object({
+    tokenString: token,
+    sids: sidsStr,
+    phone: phone,
+    address: address,
+    receiver: receiver
+  }))
+}
+
+/**
+ * 删除购物车商品 (物理删除 - 真删除)
+ * 请求地址：http://apis.netstart.cn/coffee/deleteShopcart
+ * @param token
+ * @param sids 购物车商品sid数组
+ */
+export function deleteShopCart(token: string, sids: string[]): Promise<http.HttpResponse> {
+  let sidsStr = JSON.stringify(sids);
+
+  return request("/deleteShopcart", "post", Object({
+    tokenString: token,
+    sids: sidsStr
+  }))
+}
+
+/**
+ * 查询订单接口
+ * 请求地址：http://apis.netstart.cn/coffee/findOrder
+ * @param token
+ * @param status 0:全部, 1:进行中, 2:已完成
+ */
+export function findOrder(token: string, status: number): Promise<http.HttpResponse> {
+  return request("/findOrder", "get", Object({
+    tokenString: token,
+    status: status
+  }))
+}
+
+/**
+ * 确认收货接口
+ * 请求地址：http://apis.netstart.cn/coffee/receive
+ * @param token
+ * @param oid 订单oid
+ */
+export function confirmReceive(token: string, oid: string): Promise<http.HttpResponse> {
+  return request("/receive", "post", Object({
+    tokenString: token,
+    oid: oid
+  }))
+}
+
+/**
+ * 删除订单接口
+ * 请求地址：http://apis.netstart.cn/coffee/removeOrder
+ * @param token
+ * @param oid 订单oid
+ */
+export function removeOrder(token: string, oid: string): Promise<http.HttpResponse> {
+  return request("/removeOrder", "post", Object({
+    tokenString: token,
+    oid: oid
+  }))
+}

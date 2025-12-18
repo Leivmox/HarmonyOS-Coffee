@@ -140,6 +140,7 @@ export default struct My {
       // 路由跳转
       if (title === "我的收藏") router.pushUrl({ url: "pages/MyCollect" });
       else if (title === "个人资料") router.pushUrl({ url: "pages/PersonalInfo" });
+      else if (title === "我的订单") router.pushUrl({ url: "pages/MyOrders" });
       else if (title === "安全中心") router.pushUrl({ url: "pages/SafetyCenter" });
       else if (title === "地址管理") router.pushUrl({ url: "pages/AddressManage" });
     })
